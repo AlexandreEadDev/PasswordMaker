@@ -1,35 +1,108 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+
+const dataLowercase = "azertyuiopqsdfghjklmwxcvbn";
+const dataUppercase = dataLowercase.toUpperCase();
+const dataNumbers = "0123456789";
+const dataSymbols = "$^*ùm!:;,&é\"'(-è_ç)";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [password, setPassword] = useState("Générateur de MDP");
+  const [passwordLength, setPasswordLength] = useState(8);
+  const [lowercase, setLowercase] = useState(true);
+  const [uppercase, setUppercase] = useState(false);
+  const [numbers, setNumbers] = useState(false);
+  const [symbols, setSymbols] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const generatePassword = () => {
+    let data = [];
+    let newPassword = "";
+
+    if (lowercase) data.push(...dataLowercase);
+    if (uppercase) data.push(...dataUppercase);
+    if (numbers) data.push(...dataNumbers);
+    if (symbols) data.push(...dataSymbols);
+
+    if (data.length === 0) {
+      alert("Veuillez sélectionner des critères");
+      return;
+    }
+
+    for (let i = 0; i < passwordLength; i++) {
+      newPassword += data[Math.floor(Math.random() * data.length)];
+    }
+
+    setPassword(newPassword);
+
+    navigator.clipboard.writeText(newPassword).then(() => {
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    });
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <input type="text" id="password-output" value={password} readOnly />
+
+      <div className="range-container">
+        <input
+          type="range"
+          id="password-length"
+          min="4"
+          max="24"
+          value={passwordLength}
+          onChange={(e) => setPasswordLength(e.target.value)}
+        />
+        <input
+          type="text"
+          id="display-password-length"
+          value={passwordLength}
+          readOnly
+        />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+
+      <div className="checkbox-container">
+        <input
+          type="checkbox"
+          id="lowercase"
+          checked={lowercase}
+          onChange={() => setLowercase(!lowercase)}
+        />
+        <label htmlFor="lowercase">a-z</label>
+
+        <input
+          type="checkbox"
+          id="uppercase"
+          checked={uppercase}
+          onChange={() => setUppercase(!uppercase)}
+        />
+        <label htmlFor="uppercase">A-Z</label>
+
+        <input
+          type="checkbox"
+          id="numbers"
+          checked={numbers}
+          onChange={() => setNumbers(!numbers)}
+        />
+        <label htmlFor="numbers">0-9</label>
+
+        <input
+          type="checkbox"
+          id="symbols"
+          checked={symbols}
+          onChange={() => setSymbols(!symbols)}
+        />
+        <label htmlFor="symbols">!-?</label>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <button onClick={generatePassword} id="generateButton">
+        {copied ? "Copié !" : "Générer mot de passe"}
+      </button>
+    </div>
+  );
 }
 
-export default App
+export default App;
